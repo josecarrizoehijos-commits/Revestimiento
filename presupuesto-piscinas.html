@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Presupuesto de Revestimiento · José Carrizo</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue-deep:    #020d1f;
+    --blue-dark:    #041428;
+    --blue-mid:     #0a2a50;
+    --blue-primary: #0d4a8f;
+    --blue-bright:  #1565d8;
+    --blue-neon:    #2196f3;
+    --blue-glow:    #4fc3f7;
+    --cyan-glow:    #00e5ff;
+    --white:        #ffffff;
+    --white-soft:   rgba(255,255,255,0.9);
+    --text-muted:   rgba(255,255,255,0.65);
+    --gold:         #ffd700;
+    --green:        #00e676;
+    --accent:       #00e5ff;
+  }
+
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--blue-deep);
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── BG GRID + ORBS ── */
+  .bg-grid {
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(13,74,143,0.12) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(13,74,143,0.12) 1px, transparent 1px);
+    background-size: 40px 40px;
+    z-index: 0; pointer-events: none;
+  }
+  .bg-orbs { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+  .orb {
+    position:absolute; border-radius:50%; filter:blur(80px); opacity:.18;
+    animation: orbFloat 20s ease-in-out infinite;
+  }
+  .orb-1 { width:500px;height:500px;background:var(--blue-bright);top:-200px;right:-100px;animation-delay:0s; }
+  .orb-2 { width:400px;height:400px;background:var(--cyan-glow);bottom:-150px;left:-100px;animation-delay:-7s; }
+  .orb-3 { width:300px;height:300px;background:var(--blue-neon);top:50%;left:50%;animation-delay:-14s; }
+  @keyframes orbFloat {
+    0%,100%{ transform:translate(0,0) scale(1); }
+    33%    { transform:translate(30px,-30px) scale(1.05); }
+    66%    { transform:translate(-20px,20px) scale(.95); }
+  }
+
+  .app { position:relative; z-index:1; min-height:100vh; }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 60px 24px 80px;
+    position: relative;
+  }
+
+  .cover-badge {
+    display: inline-block;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px; font-weight: 700;
+    letter-spacing: 4px; text-transform: uppercase;
+    color: var(--blue-glow);
+    border: 1px solid rgba(79,195,247,0.4);
+    padding: 8px 20px; border-radius: 30px;
+    margin-bottom: 28px;
+    animation: fadeInDown .8s ease both;
+  }
+
+  .hero-pretitle {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px; font-weight: 600;
+    letter-spacing: 6px; text-transform: uppercase;
+    color: var(--blue-glow);
+    margin-bottom: 10px;
+    animation: fadeInDown .9s .1s ease both;
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(60px, 13vw, 120px);
+    line-height: .92;
+    background: linear-gradient(180deg, #fff 0%, #90caf9 50%, var(--blue-bright) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 40px rgba(33,150,243,.5));
+    animation: fadeInUp 1s .2s ease both;
+    margin-bottom: 24px;
+  }
+
+  .hero-sub-badge {
+    display: inline-block;
+    background: linear-gradient(135deg,rgba(21,101,216,.4),rgba(13,74,143,.6));
+    border: 1px solid rgba(79,195,247,.5);
+    border-radius: 40px;
+    padding: 12px 32px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 17px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: var(--white);
+    margin-bottom: 48px;
+    animation: fadeInUp 1s .35s ease both;
+  }
+
+  .scroll-cue {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 8px;
+    color: var(--text-muted);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px; letter-spacing: 3px; text-transform: uppercase;
+    cursor: pointer;
+    animation: fadeInUp 1s .6s ease both;
+    transition: color .2s;
+  }
+  .scroll-cue:hover { color: var(--blue-glow); }
+  .scroll-cue svg { animation: bounce 1.8s ease-in-out infinite; }
+  @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(7px)} }
+
+  /* ── CALC SECTION ── */
+  #calc {
+    padding: 80px 24px 100px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .section-eyebrow {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 4px; text-transform: uppercase;
+    color: var(--blue-glow);
+    margin-bottom: 10px;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(36px, 7vw, 64px);
+    line-height: 1;
+    background: linear-gradient(135deg, #fff 0%, #90caf9 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+  }
+
+  .section-sub {
+    color: var(--text-muted);
+    font-size: .95rem;
+    line-height: 1.7;
+    max-width: 520px;
+    margin-bottom: 48px;
+  }
+
+  /* ── POOL CARDS ── */
+  .pool-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px,1fr));
+    gap: 14px;
+    margin-bottom: 48px;
+  }
+
+  .pool-card {
+    background: rgba(10,42,80,.5);
+    border: 1px solid rgba(79,195,247,.15);
+    border-radius: 14px;
+    padding: 22px 18px;
+    cursor: pointer;
+    transition: all .25s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .pool-card::before {
+    content:'';
+    position:absolute; top:0;left:0;right:0;height:2px;
+    background: linear-gradient(90deg, var(--blue-bright), var(--cyan-glow));
+    opacity:0; transition: opacity .25s;
+  }
+  .pool-card:hover {
+    border-color: rgba(79,195,247,.45);
+    background: rgba(21,101,216,.18);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 32px rgba(0,229,255,.12);
+  }
+  .pool-card.selected {
+    border-color: var(--cyan-glow);
+    background: rgba(0,229,255,.08);
+    box-shadow: 0 0 30px rgba(0,229,255,.2), 0 8px 32px rgba(0,0,0,.3);
+  }
+  .pool-card.selected::before { opacity:1; }
+
+  .card-check {
+    position:absolute; top:12px; right:12px;
+    width:22px; height:22px;
+    background: linear-gradient(135deg, var(--blue-bright), var(--cyan-glow));
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; transform:scale(.4);
+    transition: all .2s ease;
+  }
+  .pool-card.selected .card-check { opacity:1; transform:scale(1); }
+  .card-check svg { width:11px;height:11px;stroke:white;stroke-width:3;fill:none; }
+
+  .card-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 11px; letter-spacing: 3px;
+    color: var(--blue-glow);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+
+  .card-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.15rem; font-weight: 800;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: var(--white);
+    margin-bottom: 4px;
+  }
+
+  .card-dims {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+
+  .card-m2 {
+    display: inline-block;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px; font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--cyan-glow);
+    background: rgba(0,229,255,.08);
+    border: 1px solid rgba(0,229,255,.2);
+    border-radius: 20px;
+    padding: 3px 10px;
+  }
+
+  /* ── RESULT PANEL ── */
+  .result-panel {
+    background: linear-gradient(135deg, rgba(4,20,40,.95) 0%, rgba(10,42,80,.7) 100%);
+    border: 1px solid rgba(79,195,247,.25);
+    border-radius: 18px;
+    padding: 36px;
+    display: none;
+    animation: slideUp .45s ease both;
+    position: relative;
+    overflow: hidden;
+  }
+  .result-panel::before {
+    content:'';
+    position:absolute; top:0;left:0;right:0;height:3px;
+    background: linear-gradient(90deg, var(--blue-bright), var(--cyan-glow), var(--blue-bright));
+  }
+  .result-panel.visible { display:block; }
+
+  .result-eyebrow {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 4px; text-transform: uppercase;
+    color: var(--blue-glow);
+    margin-bottom: 6px;
+  }
+
+  .result-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(24px,5vw,36px);
+    color: var(--white);
+    margin-bottom: 28px;
+    line-height:1;
+  }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px,1fr));
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  .result-item {
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(79,195,247,.12);
+    border-radius: 12px;
+    padding: 16px 14px;
+  }
+  .ri-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .ri-value {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.3rem; font-weight: 800;
+    color: var(--white);
+  }
+  .ri-value.cyan { color: var(--cyan-glow); }
+
+  .result-divider {
+    border: none;
+    border-top: 1px solid rgba(79,195,247,.15);
+    margin-bottom: 24px;
+  }
+
+  .result-total-row {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+  }
+  .rt-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px; font-weight: 700;
+    letter-spacing: 4px; text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .rt-disclaimer {
+    font-size: 12px;
+    color: rgba(255,255,255,.3);
+    margin-top: 4px; line-height: 1.6;
+  }
+  .rt-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2rem,7vw,3rem);
+    color: var(--gold);
+    filter: drop-shadow(0 0 16px rgba(255,215,0,.4));
+    letter-spacing: 1px;
+  }
+
+  /* ── CTA SECTION ── */
+  .cta-section {
+    margin-top: 48px;
+    background: linear-gradient(135deg,rgba(4,20,40,.95),rgba(10,42,80,.7));
+    border: 1px solid rgba(79,195,247,.2);
+    border-radius: 18px;
+    padding: 36px;
+    display: none;
+    animation: slideUp .5s .1s ease both;
+    position: relative; overflow: hidden;
+  }
+  .cta-section::before {
+    content:'';
+    position:absolute;top:0;left:0;right:0;height:3px;
+    background: linear-gradient(90deg,#ffd700,#ff9800,#ffd700);
+  }
+  .cta-section.visible { display:block; }
+
+  .cta-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(26px,5vw,40px);
+    color: var(--white); margin-bottom: 6px; line-height:1;
+  }
+  .cta-sub {
+    color: var(--text-muted);
+    font-size: .9rem; line-height:1.7;
+    margin-bottom: 28px; max-width: 500px;
+  }
+
+  .form-row {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 16px; margin-bottom: 22px;
+  }
+  @media(max-width:520px){ .form-row{grid-template-columns:1fr;} }
+
+  .form-group { display:flex; flex-direction:column; gap:7px; }
+
+  .form-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: var(--blue-glow);
+  }
+
+  input[type="text"], input[type="tel"] {
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(79,195,247,.25);
+    border-radius: 10px;
+    padding: 13px 16px;
+    font-family: 'Barlow', sans-serif;
+    font-size: .95rem;
+    color: var(--white);
+    outline: none;
+    transition: border-color .2s, background .2s;
+  }
+  input::placeholder { color: rgba(255,255,255,.25); }
+  input:focus {
+    border-color: var(--cyan-glow);
+    background: rgba(0,229,255,.06);
+  }
+
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: linear-gradient(135deg, var(--blue-bright), var(--blue-primary));
+    color: var(--white);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    border: none; border-radius: 50px;
+    padding: 16px 36px;
+    cursor: pointer;
+    box-shadow: 0 0 40px rgba(21,101,216,.6), 0 8px 32px rgba(0,0,0,.4);
+    transition: all .3s ease;
+  }
+  .btn-primary:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 0 60px rgba(21,101,216,.8), 0 12px 40px rgba(0,0,0,.5);
+  }
+  .btn-primary svg { width:18px;height:18px;fill:currentColor;transition:transform .3s; }
+  .btn-primary:hover svg { transform:translateX(4px); }
+
+  /* ── SUCCESS ── */
+  .success-msg {
+    display: none;
+    text-align: center;
+    padding: 32px;
+    animation: fadeInUp .5s ease both;
+  }
+  .success-msg.visible { display:block; }
+
+  .success-icon {
+    width:70px;height:70px;margin:0 auto 20px;
+    background: linear-gradient(135deg,var(--green),#00897b);
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow: 0 0 30px rgba(0,230,118,.35);
+  }
+  .success-icon svg { width:32px;height:32px;stroke:white;stroke-width:2.5;fill:none; }
+
+  .success-title {
+    font-family:'Bebas Neue',sans-serif;
+    font-size:clamp(24px,5vw,36px);
+    color:var(--white); margin-bottom:8px;
+  }
+  .success-text {
+    color:var(--text-muted); font-size:.95rem; line-height:1.7;
+    max-width:420px;margin:0 auto;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: rgba(4,20,40,.95);
+    border-top: 1px solid rgba(79,195,247,.12);
+    color: var(--text-muted);
+    text-align: center;
+    padding: 32px 24px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px; letter-spacing: 2px; text-transform: uppercase;
+  }
+  footer strong { color: var(--blue-glow); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeInDown {
+    from { opacity:0; transform:translateY(-16px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  @keyframes fadeInUp {
+    from { opacity:0; transform:translateY(16px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  @keyframes slideUp {
+    from { opacity:0; transform:translateY(24px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-grid"></div>
+<div class="bg-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<div class="app">
+
+  <!-- HERO -->
+  <section id="hero">
+    <span class="cover-badge">★ Revestimiento de Piscinas ★</span>
+    <div class="hero-pretitle">José Carrizo</div>
+    <div class="hero-title">¿Cuánto cuesta<br>revestir tu piscina?</div>
+    <div class="hero-sub-badge">Calculá tu presupuesto en segundos</div>
+    <div class="scroll-cue" onclick="document.getElementById('calc').scrollIntoView({behavior:'smooth'})">
+      <span>Calcular ahora</span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 5v14M5 12l7 7 7-7"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- CALCULATOR -->
+  <section id="calc">
+    <p class="section-eyebrow">Paso 1 — Elegí el tamaño</p>
+    <h2 class="section-title">Seleccioná tu piscina</h2>
+    <p class="section-sub">
+      Elegí la medida estándar más parecida a la tuya. Trabajamos con cerámico símil venecita, quitando el revestimiento viejo e instalando el nuevo.
+    </p>
+
+    <div class="pool-grid" id="poolGrid"></div>
+
+    <!-- RESULT -->
+    <div class="result-panel" id="resultPanel">
+      <p class="result-eyebrow">▶ Presupuesto estimado</p>
+      <p class="result-name" id="rName">—</p>
+      <div class="result-grid">
+        <div class="result-item">
+          <div class="ri-label">Dimensiones</div>
+          <div class="ri-value" id="rDims">—</div>
+        </div>
+        <div class="result-item">
+          <div class="ri-label">Superficie</div>
+          <div class="ri-value cyan" id="rM2">—</div>
+        </div>
+        <div class="result-item">
+          <div class="ri-label">Materiales</div>
+          <div class="ri-value" id="rMat">—</div>
+        </div>
+        <div class="result-item">
+          <div class="ri-label">Mano de obra</div>
+          <div class="ri-value" id="rMo">—</div>
+        </div>
+      </div>
+      <hr class="result-divider">
+      <div class="result-total-row">
+        <div>
+          <div class="rt-label">Total estimado</div>
+          <div class="rt-disclaimer">* Precio aproximado. El valor final puede variar<br>según el estado real de tu piscina.</div>
+        </div>
+        <div class="rt-value" id="rTotal">—</div>
+      </div>
+    </div>
+
+    <!-- CTA FORM -->
+    <div class="cta-section" id="ctaSection">
+      <h3 class="cta-title">¿Querés tu presupuesto exacto?</h3>
+      <p class="cta-sub">Dejanos tus datos y José te contacta para medir tu piscina y darte el número real. Sin costo, sin compromiso.</p>
+      <div id="formArea">
+        <a class="btn-primary" id="btnWhatsapp" href="https://wa.me/2235405578?text=Hola%20Jos%C3%A9%2C%20quiero%20pedir%20mi%20presupuesto%20espec%C3%ADfico%20para%20revestimiento%20de%20piscina." target="_blank" rel="noopener" style="text-decoration:none;">
+          <svg viewBox="0 0 24 24"><path d="M20.52 3.48a12 12 0 1 0 0 17.04A12 12 0 0 0 20.52 3.48zm-8.54 16a9.94 9.94 0 0 1-5.31-1.53l-3.72.97 1-3.63A9.94 9.94 0 0 1 2 12 10 10 0 1 1 12 22zm5.44-7.43c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07a8.14 8.14 0 0 1-2.4-1.48 9.05 9.05 0 0 1-1.66-2.07c-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.6-.91-2.19-.24-.57-.48-.5-.67-.5h-.57a1.1 1.1 0 0 0-.8.37 3.35 3.35 0 0 0-1.05 2.5c0 1.47 1.07 2.9 1.22 3.1.15.2 2.1 3.2 5.09 4.49.71.3 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2-1.42.25-.69.25-1.28.17-1.4-.07-.12-.27-.2-.57-.35z"/></svg>
+          Pedir mi presupuesto por WhatsApp
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <strong>José Carrizo</strong> &nbsp;·&nbsp; Revestimiento de Piscinas &nbsp;·&nbsp; Presupuesto sin compromiso
+  </footer>
+
+</div><!-- /app -->
+
+<script>
+  // ── CONFIG DE PRECIOS (modificar acá) ──
+  const piscinas = [
+    { id:'chica',    nombre:'Piscina Pequeña',  dims:'4 × 2 m',   prof:'1,20 m', m2:28,  mat:1100000, mo:1800000 },
+    { id:'media',    nombre:'Piscina Mediana',  dims:'5 × 2.5 m', prof:'1,30 m', m2:37,  mat:1320000, mo:2000000 },
+    { id:'estandar', nombre:'Piscina Estándar', dims:'7 × 3 m',   prof:'1,40 m', m2:47,  mat:1100000, mo:2700000 },
+    { id:'grande',   nombre:'Piscina Grande',   dims:'8 × 3.5 m', prof:'1,50 m', m2:62,  mat:2150000, mo:3600000 },
+    { id:'xl',       nombre:'Piscina XL',       dims:'10 × 4 m',  prof:'1,60 m', m2:84,  mat:2800000, mo:4200000 },
+  ];
+
+  function fmt(n){
+    return '$\u202f' + n.toLocaleString('es-AR');
+  }
+
+  // Render cards
+  const grid = document.getElementById('poolGrid');
+  piscinas.forEach((p, idx) => {
+    const c = document.createElement('div');
+    c.className = 'pool-card';
+    c.dataset.id = p.id;
+    c.innerHTML = `
+      <div class="card-check"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+      <div class="card-num">OPCIÓN 0${idx+1}</div>
+      <div class="card-name">${p.nombre}</div>
+      <div class="card-dims">${p.dims} &nbsp;·&nbsp; Prof. ${p.prof}</div>
+      <span class="card-m2">~${p.m2} m²</span>
+    `;
+    c.addEventListener('click', () => seleccionar(p.id));
+    grid.appendChild(c);
+  });
+
+  function seleccionar(id) {
+    document.querySelectorAll('.pool-card').forEach(c => c.classList.remove('selected'));
+    document.querySelector(`.pool-card[data-id="${id}"]`).classList.add('selected');
+
+    const p = piscinas.find(x => x.id === id);
+    const mat   = p.mat;
+    const mo    = p.mo;
+    const total = mat + mo;
+
+    document.getElementById('rName').textContent  = p.nombre + ' — ' + p.dims;
+    document.getElementById('rDims').textContent  = p.dims + ', Prof. ' + p.prof;
+    document.getElementById('rM2').textContent    = '~' + p.m2 + ' m²';
+    document.getElementById('rMat').textContent   = fmt(mat);
+    document.getElementById('rMo').textContent    = fmt(mo);
+    document.getElementById('rTotal').textContent = fmt(total);
+
+    const rp = document.getElementById('resultPanel');
+    const cs = document.getElementById('ctaSection');
+    rp.classList.add('visible');
+    cs.classList.add('visible');
+
+    setTimeout(() => rp.scrollIntoView({ behavior:'smooth', block:'start' }), 100);
+  }
+
+
+</script>
+</body>
+</html>
